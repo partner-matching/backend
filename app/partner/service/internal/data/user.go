@@ -24,6 +24,25 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	}
 }
 
+func (r *userRepo) GetUsersList(ctx context.Context, pageNum, pageSize int32) ([]*biz.User, error) {
+	if pageNum == 0 {
+		pageNum = 1
+	}
+	list := make([]*User, 0)
+	err := r.data.db.WithContext(ctx).Where("id >= ? and isDelete = 0", (pageNum-1)*pageSize).Limit(int(pageSize)).Find(&list).Error
+	if err != nil {
+		return nil, errors.Wrapf(err, fmt.Sprintf("fail to get users list"))
+	}
+
+	var usersList []*biz.User
+	for _, item := range list {
+		user := &biz.User{}
+		util.StructAssign(user, item)
+		usersList = append(usersList, user)
+	}
+	return usersList, nil
+}
+
 func (r *userRepo) GetUserRole(ctx context.Context) (int32, int32, error) {
 	user, err := r.getUserFromSession(ctx)
 	if err != nil {

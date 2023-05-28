@@ -131,3 +131,30 @@ func (s *PartnerService) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) 
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (s *PartnerService) UsersRecommend(ctx context.Context, req *v1.UsersRecommendReq) (*v1.UsersRecommendReply, error) {
+	usersList, err := s.uc.UsersRecommend(ctx, req.PageNum, req.PageSize)
+	if err != nil {
+		return nil, err
+	}
+	reply := &v1.UsersRecommendReply{
+		Data: make([]*v1.User, 0, len(usersList)),
+	}
+	for _, item := range usersList {
+		reply.Data = append(reply.Data, &v1.User{
+			Id:          item.Id,
+			UserName:    item.UserName,
+			UserAccount: item.UserAccount,
+			AvatarUrl:   item.AvatarUrl,
+			Phone:       item.Phone,
+			Email:       item.Email,
+			UserStatus:  item.UserStatus,
+			Gender:      item.Gender,
+			UserRole:    item.Role,
+			CreateTime:  item.CreateTime.String(),
+			Tags:        item.Tags,
+			Profile:     item.Profile,
+		})
+	}
+	return reply, nil
+}

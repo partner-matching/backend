@@ -54,12 +54,27 @@ insert into user value (null, '顾平', 'Eckard',
 insert into user value (null, '戴玉', 'Wally',
                         'http://cdn.u2.huluxia.com/g3/M01/36/70/wKgBOVwPoOyAZZQ4AAIt-Z3iUwQ316.jpg',
                         0, '25d55ad283aa400af464c76d713c07ad', null, null, 0, '2023-05-01 13:56:40', null, 0, 1,
-                        '{"大一":1,"C++":1,"emo":1}', '未来一定会很好，即使现在有诸多的不幸。相信糟糕的日子熬过去了，剩下的就是好运气。');
+                        '{"大一":1,"C++":1,"emo":1}', '人生就像沙漏，今天它要补满所有的缺口；明天它要修補所有的窟窿。');
 
 insert into user value (null, '惠俊哲', 'Velarde',
                         'http://cdn.u2.huluxia.com/g3/M03/29/B8/wKgBOVwKZPyAeZyOAAGBKo7j4sY097.jpg',
                         0, '25d55ad283aa400af464c76d713c07ad', null, null, 0, '2023-05-01 13:56:40', null, 0, 1,
                         '{"随和":1,"程序员":1,"Python":1}', '当你不再寻找爱情，只是去爱；当你不再渴望成功，只是去做；你不再追求成长，只是去修，一切才真正开始。');
+
+insert into user value (null, '弥芷珍', 'Jesse',
+                        'http://cdn.u2.huluxia.com/g3/M01/36/6B/wKgBOVwPn8SAfHRcAAC046awE3Q885.jpg',
+                        0, '25d55ad283aa400af464c76d713c07ad', null, null, 0, '2023-05-01 13:56:40', null, 0, 1,
+                        '{"伤心":1,"萌妹子":1,"Web3":1}', '我是一个废物，但并不代表我没有尊严。');
+
+insert into user value (null, '玉晗玥', 'Ridley',
+                        'http://cdn.u2.huluxia.com/g3/M03/26/B6/wKgBOVwJE7KAA5CyAAOIpyg9x28469.jpg',
+                        0, '25d55ad283aa400af464c76d713c07ad', null, null, 0, '2023-05-01 13:56:40', null, 0, 1,
+                        '{"开心":1,"萌妹子":1,"Docker":1}', '我不是一个完美的人，但是我接受所有的不完美。');
+
+insert into user value (null, '局曼雁', 'Lowell',
+                        'http://cdn.u2.huluxia.com/g3/M01/27/D3/wKgBOVwJonyAKm54AAH-N0Lk_io211.jpg',
+                        0, '25d55ad283aa400af464c76d713c07ad', null, null, 0, '2023-05-01 13:56:40', null, 0, 1,
+                        '{"emo":1,"乐子人":1,"C++":1}', '你是我的小确幸，可就算你不喜欢我，我也不会再去追寻别人。');
 
 
 

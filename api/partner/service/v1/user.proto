@@ -70,6 +70,13 @@ service UserService {
     };
   }
 
+  //用户推荐
+  rpc UsersRecommend(UsersRecommendReq)returns (UsersRecommendReply){
+    option (google.api.http) = {
+      get: "/api/user/recommend",
+    };
+  }
+
 }
 
 message UserRegisterReq{
@@ -115,6 +122,15 @@ message GetCurrentReply{
 
 message UpdateUserReq{
   User data = 1;
+}
+
+message UsersRecommendReq{
+  int32 pageNum = 1;
+  int32 pageSize = 2;
+}
+
+message UsersRecommendReply{
+  repeated User data = 1;
 }
 
 message User{

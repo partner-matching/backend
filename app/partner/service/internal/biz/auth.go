@@ -125,11 +125,10 @@ func (r *AuthRepoUseCase) isAccountWordsValidate(userAccount string) (bool, erro
 	return match, nil
 }
 
-func (r *AuthRepoUseCase) passwordMD5Hash(userAccount string) string {
+func (r *AuthRepoUseCase) passwordMD5Hash(userPassword string) string {
 	m := md5.New()
-	m.Write([]byte(userAccount))
+	m.Write([]byte(userPassword))
 	return hex.EncodeToString(m.Sum(nil))
-
 }
 
 // UserLogin 登录逻辑

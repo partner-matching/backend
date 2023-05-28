@@ -168,3 +168,15 @@ func IsUpdateUser(err error) bool {
 func ErrorUpdateUser(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, UserErrorReason_UPDATE_USER.String(), fmt.Sprintf(format, args...))
 }
+
+func IsUsersRecommendFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == UserErrorReason_USERS_RECOMMEND_FAILED.String() && e.Code == 500
+}
+
+func ErrorUsersRecommendFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, UserErrorReason_USERS_RECOMMEND_FAILED.String(), fmt.Sprintf(format, args...))
+}

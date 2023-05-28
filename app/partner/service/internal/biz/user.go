@@ -19,6 +19,7 @@ type UserRepo interface {
 	SearchUsersByTags(ctx context.Context, tagList []string) ([]*User, error)
 	UpdateUser(ctx context.Context, update *UpdateUser) error
 	DeleteUser(ctx context.Context, userName int32) error
+	GetUsersList(ctx context.Context, pageNum, pageSize int32) ([]*User, error)
 	GetUserRole(ctx context.Context) (int32, int32, error)
 	GetUserSession(ctx context.Context) (*User, error)
 	GetCurrentUser(ctx context.Context, userId int32) (*User, error)
@@ -204,6 +205,15 @@ func (r *UserUseCase) UpdateUser(ctx context.Context, updateUser *UpdateUser) er
 		return v1.ErrorUpdateUser("%s", err.Error())
 	}
 	return nil
+}
+
+// UsersRecommend 用户推荐
+func (r *UserUseCase) UsersRecommend(ctx context.Context, pageNum, pageSize int32) ([]*User, error) {
+	usersList, err := r.repo.GetUsersList(ctx, pageNum, pageSize)
+	if err != nil {
+		return nil, v1.ErrorUsersRecommendFailed("%s", err.Error())
+	}
+	return usersList, nil
 }
 
 func (r *UserUseCase) isAdmin(ctx context.Context) error {
