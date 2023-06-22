@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonC80ae7adDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(in *jlexer.Lexer, out *User) {
+func easyjsonC80ae7adDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(in *jlexer.Lexer, out *User) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -66,6 +66,10 @@ func easyjsonC80ae7adDecodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 			out.IsDelete = int32(in.Int32())
 		case "role":
 			out.Role = int32(in.Int32())
+		case "tags":
+			out.Tags = string(in.String())
+		case "profile":
+			out.Profile = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -76,7 +80,7 @@ func easyjsonC80ae7adDecodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(out *jwriter.Writer, in User) {
+func easyjsonC80ae7adEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(out *jwriter.Writer, in User) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -145,29 +149,39 @@ func easyjsonC80ae7adEncodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 		out.RawString(prefix)
 		out.Int32(int32(in.Role))
 	}
+	{
+		const prefix string = ",\"tags\":"
+		out.RawString(prefix)
+		out.String(string(in.Tags))
+	}
+	{
+		const prefix string = ",\"profile\":"
+		out.RawString(prefix)
+		out.String(string(in.Profile))
+	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
 func (v User) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(&w, v)
+	easyjsonC80ae7adEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v User) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(w, v)
+	easyjsonC80ae7adEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *User) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(&r, v)
+	easyjsonC80ae7adDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalData(l, v)
+	easyjsonC80ae7adDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalData(l, v)
 }
