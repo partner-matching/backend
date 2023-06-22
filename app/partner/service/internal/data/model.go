@@ -20,3 +20,18 @@ type User struct {
 	Tags         string
 	Profile      string
 }
+
+//easyjson:json
+type Team struct {
+	Id          int32
+	Name        string
+	Description string
+	MaxNum      int32     `gorm:"column:maxNum"`
+	ExpireTime  time.Time `gorm:"column:expireTime"`
+	UserId      int32     `gorm:"column:userId"`
+	Status      int32
+	Password    string
+	CreateTime  time.Time `gorm:"column:createTime"`
+	UpdateTime  time.Time `gorm:"column :updateTime"`
+	IsDelete    int32     `gorm:"column:isDelete"`
+}
