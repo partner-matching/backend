@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-redsync/redsync/v4"
+	"github.com/go-redsync/redsync/v4/redis/goredis/v8"
 	"github.com/google/wire"
 	"github.com/partner-matching/backend/app/partner/service/internal/biz"
 	"github.com/partner-matching/backend/app/partner/service/internal/conf"
@@ -15,12 +17,13 @@ import (
 	"time"
 )
 
-var ProviderSet = wire.NewSet(NewData, NewDB, NewTransaction, NewRedis, NewRecovery, NewUserRepo, NewAuthRepo, NewSession)
+var ProviderSet = wire.NewSet(NewData, NewDB, NewTransaction, NewRedis, NewRecovery, NewUserRepo, NewAuthRepo, NewPartnerRepo, NewSession, NewRedSync)
 
 type Data struct {
 	log          *log.Helper
 	db           *gorm.DB
 	redisCli     redis.Cmdable
+	redSync      *redsync.Mutex
 	conf         *conf.UserConstant
 	sessionStore *redistore.RediStore
 }
@@ -114,6 +117,17 @@ func NewRedis(conf *conf.Data) redis.Cmdable {
 	return client
 }
 
+// NewRedSync 基于redis的分布式锁
+func NewRedSync(conf *conf.Data) *redsync.Mutex {
+	client := redis.NewClient(&redis.Options{
+		Addr: conf.Redis.Addr + conf.Redis.Port,
+	})
+	pool := goredis.NewPool(client)
+	rs := redsync.New(pool)
+	// 锁名字
+	return rs.NewMutex(conf.Redis.LockKey)
+}
+
 // NewSession 初始化session
 func NewSession(data *conf.Data, constant *conf.UserConstant) *redistore.RediStore {
 	l := log.NewHelper(log.With(log.GetLogger(), "module", "user/data/session"))
@@ -125,7 +139,7 @@ func NewSession(data *conf.Data, constant *conf.UserConstant) *redistore.RediSto
 	return store
 }
 
-func NewData(db *gorm.DB, redisCmd redis.Cmdable, logger log.Logger, conf *conf.UserConstant, sessionStore *redistore.RediStore) (*Data, func(), error) {
+func NewData(db *gorm.DB, redisCmd redis.Cmdable, redSync *redsync.Mutex, logger log.Logger, conf *conf.UserConstant, sessionStore *redistore.RediStore) (*Data, func(), error) {
 	l := log.NewHelper(log.With(log.GetLogger(), "module", "user/data/new-data"))
 
 	d := &Data{
@@ -134,6 +148,7 @@ func NewData(db *gorm.DB, redisCmd redis.Cmdable, logger log.Logger, conf *conf.
 		redisCli:     redisCmd,
 		conf:         conf,
 		sessionStore: sessionStore,
+		redSync:      redSync,
 	}
 	return d, func() {
 		l.Info("closing the data resources")
