@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package partner_error.v1;
+import "errors/errors.proto";
+
+option go_package = "api/partner/service/v1/pb;v1";
+
+enum PartnerErrorReason {
+  option (errors.default_code) = 500;
+
+  //  Get_Account_Failed = 1 [(errors.code) = 401];
+  ADD_TEAM_FAILED = 0;
+  DELETE_TEAM_FAILED = 1;
+  UPDATE_TEAM_FAILED = 2;
+  GET_TEAM_FAILED = 3;
+  GET_TEAM_LIST_FAILED = 4;
+}
