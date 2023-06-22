@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package interface.v1;
+package user_error.v1;
 import "errors/errors.proto";
 
 option go_package = "api/partner/service/v1/pb;v1";
