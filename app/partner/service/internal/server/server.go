@@ -8,7 +8,7 @@ import (
 )
 
 // ProviderSet is user providers.
-var ProviderSet = wire.NewSet(NewHTTPServer, NewGRPCServer)
+var ProviderSet = wire.NewSet(NewHTTPServer, NewGRPCServer, NewCronJob)
 var (
 	ErrorsMsgMap = map[string]string{
 		"UNKNOWN_ERROR":        "未知错误",
