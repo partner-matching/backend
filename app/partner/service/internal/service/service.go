@@ -15,16 +15,18 @@ type PartnerService struct {
 	v1.UnimplementedUserServiceServer
 	uc  *biz.UserUseCase
 	ac  *biz.AuthRepoUseCase
+	pc  *biz.PartnerRepoUseCase
 	vc  *biz.ValidateUseCase
 	log *log.Helper
 }
 
-func NewUserService(uc *biz.UserUseCase, ac *biz.AuthRepoUseCase, vc *biz.ValidateUseCase, logger log.Logger) *PartnerService {
+func NewUserService(uc *biz.UserUseCase, ac *biz.AuthRepoUseCase, pc *biz.PartnerRepoUseCase, vc *biz.ValidateUseCase, logger log.Logger) *PartnerService {
 	return &PartnerService{
 		log: log.NewHelper(log.With(logger, "module", "user/service")),
 		uc:  uc,
 		ac:  ac,
 		vc:  vc,
+		pc:  pc,
 	}
 }
 
