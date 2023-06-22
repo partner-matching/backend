@@ -14,6 +14,7 @@ data:
     read_timeout: 0.2s
     write_timeout: 0.2s
     port: :6379
+    lock_key: "recommend_lock_key"
 constant:
   userLoginState: userLoginState
   sessionTimeout: 86400
