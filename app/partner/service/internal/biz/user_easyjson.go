@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson9e1087fdDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(in *jlexer.Lexer, out *User) {
+func easyjson9e1087fdDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(in *jlexer.Lexer, out *User) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -56,6 +56,14 @@ func easyjson9e1087fdDecodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 			out.UserStatus = int32(in.Int32())
 		case "role":
 			out.Role = int32(in.Int32())
+		case "createTime":
+			if data := in.Raw(); in.Ok() {
+				in.AddError((out.CreateTime).UnmarshalJSON(data))
+			}
+		case "tags":
+			out.Tags = string(in.String())
+		case "profile":
+			out.Profile = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -66,7 +74,7 @@ func easyjson9e1087fdDecodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 		in.Consumed()
 	}
 }
-func easyjson9e1087fdEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(out *jwriter.Writer, in User) {
+func easyjson9e1087fdEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(out *jwriter.Writer, in User) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -120,29 +128,44 @@ func easyjson9e1087fdEncodeGithubComUserCenterUserCenterBackendAppUserServiceInt
 		out.RawString(prefix)
 		out.Int32(int32(in.Role))
 	}
+	{
+		const prefix string = ",\"createTime\":"
+		out.RawString(prefix)
+		out.Raw((in.CreateTime).MarshalJSON())
+	}
+	{
+		const prefix string = ",\"tags\":"
+		out.RawString(prefix)
+		out.String(string(in.Tags))
+	}
+	{
+		const prefix string = ",\"profile\":"
+		out.RawString(prefix)
+		out.String(string(in.Profile))
+	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
 func (v User) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson9e1087fdEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(&w, v)
+	easyjson9e1087fdEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v User) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson9e1087fdEncodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(w, v)
+	easyjson9e1087fdEncodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *User) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson9e1087fdDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(&r, v)
+	easyjson9e1087fdDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson9e1087fdDecodeGithubComUserCenterUserCenterBackendAppUserServiceInternalBiz(l, v)
+	easyjson9e1087fdDecodeGithubComPartnerMatchingBackendAppPartnerServiceInternalBiz(l, v)
 }
