@@ -27,3 +27,29 @@ func GetRequestAndResponse(ctx context.Context) (*http.Request, http.ResponseWri
 	res := reflect.NewAt(s.Type(), unsafe.Pointer(s.UnsafeAddr())).Elem().Interface().(http.ResponseWriter)
 	return req, res
 }
+
+func PrintNonZeroFieldsAndValues(s interface{}) map[string]interface{} {
+	// 获取结构体的值和类型
+	v := reflect.ValueOf(s)
+	t := reflect.TypeOf(s)
+	result := make(map[string]interface{}, 0)
+
+	// 遍历结构体的所有字段
+	for i := 0; i < v.NumField(); i++ {
+		// 获取字段的值和类型
+		fieldValue := v.Field(i)
+		fieldType := t.Field(i)
+
+		// 检查字段是否为零值
+		if !isZero(fieldValue) {
+			// 打印非零值字段的名称和值
+			//fmt.Printf("%s: %v\n", fieldType.Name, fieldValue.Interface())
+			result[fieldType.Name] = fieldValue.Interface()
+		}
+	}
+	return result
+}
+
+func isZero(v reflect.Value) bool {
+	return v.Interface() == reflect.Zero(v.Type()).Interface()
+}
