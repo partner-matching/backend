@@ -22,8 +22,9 @@ import (
 func wireApp(confServer *conf.Server, confData *conf.Data, userConstant *conf.UserConstant, logger log.Logger) (*kratos.App, func(), error) {
 	db := data.NewDB(confData)
 	cmdable := data.NewRedis(confData)
+	mutex := data.NewRedSync(confData)
 	rediStore := data.NewSession(confData, userConstant)
-	dataData, cleanup, err := data.NewData(db, cmdable, logger, userConstant, rediStore)
+	dataData, cleanup, err := data.NewData(db, cmdable, mutex, logger, userConstant, rediStore)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -33,11 +34,14 @@ func wireApp(confServer *conf.Server, confData *conf.Data, userConstant *conf.Us
 	userUseCase := biz.NewUserUseCase(userRepo, recovery, transaction, logger, userConstant)
 	authRepo := data.NewAuthRepo(dataData, logger)
 	authRepoUseCase := biz.NewAuthRepoUseCase(authRepo, recovery, transaction, logger)
+	partnerRepo := data.NewPartnerRepo(dataData, logger)
+	partnerRepoUseCase := biz.NewPartnerRepoUseCase(partnerRepo, recovery, transaction, logger)
 	validateUseCase := biz.NewValidateUseCase()
-	partnerService := service.NewUserService(userUseCase, authRepoUseCase, validateUseCase, logger)
+	partnerService := service.NewUserService(userUseCase, authRepoUseCase, partnerRepoUseCase, validateUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, partnerService, logger)
 	httpServer := server.NewHTTPServer(confServer, partnerService, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	cronJob := server.NewCronJob(mutex, userUseCase)
+	app := newApp(logger, grpcServer, httpServer, cronJob)
 	return app, func() {
 		cleanup()
 	}, nil
