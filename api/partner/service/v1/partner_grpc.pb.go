@@ -7,7 +7,11 @@
 package v1
 
 import (
+	context "context"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -15,12 +19,23 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-const ()
+const (
+	PartnerService_AddTeam_FullMethodName     = "/partner.v1.PartnerService/AddTeam"
+	PartnerService_DeleteTeam_FullMethodName  = "/partner.v1.PartnerService/DeleteTeam"
+	PartnerService_UpdateTeam_FullMethodName  = "/partner.v1.PartnerService/UpdateTeam"
+	PartnerService_GetTeam_FullMethodName     = "/partner.v1.PartnerService/GetTeam"
+	PartnerService_GetTeamList_FullMethodName = "/partner.v1.PartnerService/GetTeamList"
+)
 
 // PartnerServiceClient is the client API for PartnerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PartnerServiceClient interface {
+	AddTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*GetTeamResponse, error)
+	GetTeamList(ctx context.Context, in *GetTeamListReq, opts ...grpc.CallOption) (*GetTeamListResponse, error)
 }
 
 type partnerServiceClient struct {
@@ -31,10 +46,60 @@ func NewPartnerServiceClient(cc grpc.ClientConnInterface) PartnerServiceClient {
 	return &partnerServiceClient{cc}
 }
 
+func (c *partnerServiceClient) AddTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PartnerService_AddTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *partnerServiceClient) DeleteTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PartnerService_DeleteTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *partnerServiceClient) UpdateTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PartnerService_UpdateTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *partnerServiceClient) GetTeam(ctx context.Context, in *Team, opts ...grpc.CallOption) (*GetTeamResponse, error) {
+	out := new(GetTeamResponse)
+	err := c.cc.Invoke(ctx, PartnerService_GetTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *partnerServiceClient) GetTeamList(ctx context.Context, in *GetTeamListReq, opts ...grpc.CallOption) (*GetTeamListResponse, error) {
+	out := new(GetTeamListResponse)
+	err := c.cc.Invoke(ctx, PartnerService_GetTeamList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PartnerServiceServer is the server API for PartnerService service.
 // All implementations must embed UnimplementedPartnerServiceServer
 // for forward compatibility
 type PartnerServiceServer interface {
+	AddTeam(context.Context, *Team) (*emptypb.Empty, error)
+	DeleteTeam(context.Context, *Team) (*emptypb.Empty, error)
+	UpdateTeam(context.Context, *Team) (*emptypb.Empty, error)
+	GetTeam(context.Context, *Team) (*GetTeamResponse, error)
+	GetTeamList(context.Context, *GetTeamListReq) (*GetTeamListResponse, error)
 	mustEmbedUnimplementedPartnerServiceServer()
 }
 
@@ -42,6 +107,21 @@ type PartnerServiceServer interface {
 type UnimplementedPartnerServiceServer struct {
 }
 
+func (UnimplementedPartnerServiceServer) AddTeam(context.Context, *Team) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTeam not implemented")
+}
+func (UnimplementedPartnerServiceServer) DeleteTeam(context.Context, *Team) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
+}
+func (UnimplementedPartnerServiceServer) UpdateTeam(context.Context, *Team) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeam not implemented")
+}
+func (UnimplementedPartnerServiceServer) GetTeam(context.Context, *Team) (*GetTeamResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
+}
+func (UnimplementedPartnerServiceServer) GetTeamList(context.Context, *GetTeamListReq) (*GetTeamListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamList not implemented")
+}
 func (UnimplementedPartnerServiceServer) mustEmbedUnimplementedPartnerServiceServer() {}
 
 // UnsafePartnerServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -55,13 +135,124 @@ func RegisterPartnerServiceServer(s grpc.ServiceRegistrar, srv PartnerServiceSer
 	s.RegisterService(&PartnerService_ServiceDesc, srv)
 }
 
+func _PartnerService_AddTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Team)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).AddTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_AddTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).AddTeam(ctx, req.(*Team))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PartnerService_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Team)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).DeleteTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_DeleteTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).DeleteTeam(ctx, req.(*Team))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PartnerService_UpdateTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Team)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).UpdateTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_UpdateTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).UpdateTeam(ctx, req.(*Team))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PartnerService_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Team)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).GetTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_GetTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).GetTeam(ctx, req.(*Team))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PartnerService_GetTeamList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTeamListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).GetTeamList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_GetTeamList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).GetTeamList(ctx, req.(*GetTeamListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PartnerService_ServiceDesc is the grpc.ServiceDesc for PartnerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PartnerService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "partner.v1.PartnerService",
 	HandlerType: (*PartnerServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "partner/service/v1/partner.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddTeam",
+			Handler:    _PartnerService_AddTeam_Handler,
+		},
+		{
+			MethodName: "DeleteTeam",
+			Handler:    _PartnerService_DeleteTeam_Handler,
+		},
+		{
+			MethodName: "UpdateTeam",
+			Handler:    _PartnerService_UpdateTeam_Handler,
+		},
+		{
+			MethodName: "GetTeam",
+			Handler:    _PartnerService_GetTeam_Handler,
+		},
+		{
+			MethodName: "GetTeamList",
+			Handler:    _PartnerService_GetTeamList_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "partner/service/v1/partner.proto",
 }
