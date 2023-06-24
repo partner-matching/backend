@@ -35,3 +35,13 @@ type Team struct {
 	UpdateTime  time.Time `gorm:"column :updateTime"`
 	IsDelete    int32     `gorm:"column:isDelete"`
 }
+
+type UserTeam struct {
+	Id         int32
+	UserId     int32     `gorm:"column:userId"`
+	TeamId     int32     `gorm:"column:teamId"`
+	JoinTime   time.Time `gorm:"column:joinTime"`
+	CreateTime time.Time `gorm:"column:createTime"`
+	UpdateTime time.Time `gorm:"column :updateTime"`
+	IsDelete   int32     `gorm:"column:isDelete"`
+}
