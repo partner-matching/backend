@@ -16,4 +16,5 @@ enum PartnerErrorReason {
   GET_TEAM_LIST_FAILED = 4;
   ADD_USER_TEAM_FAILED = 5;
   JOIN_TEAM_FAILED = 6;
+  Quit_TEAM_FAILED = 7;
 }

@@ -96,3 +96,15 @@ func IsJoinTeamFailed(err error) bool {
 func ErrorJoinTeamFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, PartnerErrorReason_JOIN_TEAM_FAILED.String(), fmt.Sprintf(format, args...))
 }
+
+func IsQuitTeamFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == PartnerErrorReason_Quit_TEAM_FAILED.String() && e.Code == 500
+}
+
+func ErrorQuitTeamFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, PartnerErrorReason_Quit_TEAM_FAILED.String(), fmt.Sprintf(format, args...))
+}
