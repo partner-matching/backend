@@ -78,7 +78,7 @@ func (r *AuthRepoUseCase) UserRegister(ctx context.Context, userAccount, userPas
 	// 4、插入数据
 	id, err := r.repo.UserRegister(ctx, userAccount, passwordHash)
 	if err != nil {
-		return 0, v1.ErrorUserRegisterFailed("%s", err.Error())
+		return 0, v1.ErrorUserRegisterFailed("用户注册失败: %s", err.Error())
 	}
 	return id, nil
 }
@@ -94,19 +94,19 @@ func (r *AuthRepoUseCase) validateAccountBeforeRegister(ctx context.Context, use
 	// 账户不能含有特殊字符
 	pass, err := r.isAccountWordsValidate(userAccount)
 	if err != nil {
-		return v1.ErrorUnknownError("%s", err.Error())
+		return v1.ErrorUnknownError("未知错误: %s", err.Error())
 	}
 	if pass {
-		return v1.ErrorAccountIllegal("account(%s) illegal!", userAccount)
+		return v1.ErrorAccountIllegal("账户不能含有特殊字符: %s", userAccount)
 	}
 
 	// 账户不能重复
 	exist, err := r.isAccountExist(ctx, userAccount)
 	if err != nil {
-		return v1.ErrorUnknownError("%s", err.Error())
+		return v1.ErrorUnknownError("未知错误: %s", err.Error())
 	}
 	if exist {
-		return v1.ErrorAccountExist("account(%s) exist!", userAccount)
+		return v1.ErrorAccountExist("账号已存在!", userAccount)
 	}
 	return nil
 }
@@ -156,13 +156,13 @@ func (r *AuthRepoUseCase) UserLogin(ctx context.Context, userAccount, userPasswo
 	// 4、登录
 	user, err := r.repo.UserLogin(ctx, userAccount, passwordHash)
 	if err != nil {
-		return nil, v1.ErrorUserLoginFailed("%s", err.Error())
+		return nil, v1.ErrorUserLoginFailed("用户登录失败或账号不存在: %s", err.Error())
 	}
 
 	// 5、存储登录的session
 	err = r.repo.SetLoginSession(ctx, user)
 	if err != nil {
-		return nil, v1.ErrorUserLoginFailed("set user login session failed: %s", err.Error())
+		return nil, v1.ErrorUserLoginFailed("用户登录失败: %s", err.Error())
 	}
 
 	return user, nil
@@ -173,19 +173,19 @@ func (r *AuthRepoUseCase) UserLogin(ctx context.Context, userAccount, userPasswo
 func (r *AuthRepoUseCase) UserLogout(ctx context.Context) error {
 	err := r.repo.UserLogout(ctx)
 	if err != nil {
-		return v1.ErrorUserLogoutFailed("%s", err.Error())
+		return v1.ErrorUserLogoutFailed("用户注销失败: %s", err.Error())
 	}
 	return nil
 }
 
-func (r *AuthRepoUseCase) validateAccountBeforeLogin(ctx context.Context, userAccount string) error {
+func (r *AuthRepoUseCase) validateAccountBeforeLogin(_ context.Context, userAccount string) error {
 	// 账户不能含有特殊字符
 	pass, err := r.isAccountWordsValidate(userAccount)
 	if err != nil {
-		return v1.ErrorUnknownError("%s", err.Error())
+		return v1.ErrorUnknownError("未知错误: %s", err.Error())
 	}
 	if pass {
-		return v1.ErrorAccountIllegal("account(%s) illegal!", userAccount)
+		return v1.ErrorAccountIllegal("账户不能含有特殊字符!", userAccount)
 	}
 	return nil
 }
