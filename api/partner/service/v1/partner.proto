@@ -51,6 +51,13 @@ service PartnerService {
     };
   }
 
+  rpc QuitTeam (QuitTeamReq) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/api/team/quit",
+      body: "*"
+    };
+  }
+
 }
 
 message GetTeamResponse{
@@ -90,6 +97,10 @@ message GetTeamListReq{
 message JoinTeamReq{
   int32 id = 1;
   string passWord = 2;
+}
+
+message QuitTeamReq{
+  int32 id = 1;
 }
 
 message Team{

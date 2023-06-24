@@ -25,6 +25,7 @@ const OperationPartnerServiceDeleteTeam = "/partner.v1.PartnerService/DeleteTeam
 const OperationPartnerServiceGetTeam = "/partner.v1.PartnerService/GetTeam"
 const OperationPartnerServiceGetTeamList = "/partner.v1.PartnerService/GetTeamList"
 const OperationPartnerServiceJoinTeam = "/partner.v1.PartnerService/JoinTeam"
+const OperationPartnerServiceQuitTeam = "/partner.v1.PartnerService/QuitTeam"
 const OperationPartnerServiceUpdateTeam = "/partner.v1.PartnerService/UpdateTeam"
 
 type PartnerServiceHTTPServer interface {
@@ -33,6 +34,7 @@ type PartnerServiceHTTPServer interface {
 	GetTeam(context.Context, *GetTeamReq) (*GetTeamResponse, error)
 	GetTeamList(context.Context, *GetTeamListReq) (*GetTeamListResponse, error)
 	JoinTeam(context.Context, *JoinTeamReq) (*emptypb.Empty, error)
+	QuitTeam(context.Context, *QuitTeamReq) (*emptypb.Empty, error)
 	UpdateTeam(context.Context, *UpdateTeamReq) (*emptypb.Empty, error)
 }
 
@@ -44,6 +46,7 @@ func RegisterPartnerServiceHTTPServer(s *http.Server, srv PartnerServiceHTTPServ
 	r.GET("/api/team/get", _PartnerService_GetTeam0_HTTP_Handler(srv))
 	r.GET("/api/team/list", _PartnerService_GetTeamList0_HTTP_Handler(srv))
 	r.POST("/api/team/join", _PartnerService_JoinTeam0_HTTP_Handler(srv))
+	r.POST("/api/team/quit", _PartnerService_QuitTeam0_HTTP_Handler(srv))
 }
 
 func _PartnerService_AddTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
@@ -160,12 +163,32 @@ func _PartnerService_JoinTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(c
 	}
 }
 
+func _PartnerService_QuitTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in QuitTeamReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPartnerServiceQuitTeam)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.QuitTeam(ctx, req.(*QuitTeamReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PartnerServiceHTTPClient interface {
 	AddTeam(ctx context.Context, req *Team, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteTeam(ctx context.Context, req *DeleteTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetTeam(ctx context.Context, req *GetTeamReq, opts ...http.CallOption) (rsp *GetTeamResponse, err error)
 	GetTeamList(ctx context.Context, req *GetTeamListReq, opts ...http.CallOption) (rsp *GetTeamListResponse, err error)
 	JoinTeam(ctx context.Context, req *JoinTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	QuitTeam(ctx context.Context, req *QuitTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	UpdateTeam(ctx context.Context, req *UpdateTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -234,6 +257,19 @@ func (c *PartnerServiceHTTPClientImpl) JoinTeam(ctx context.Context, in *JoinTea
 	pattern := "/api/team/join"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPartnerServiceJoinTeam))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *PartnerServiceHTTPClientImpl) QuitTeam(ctx context.Context, in *QuitTeamReq, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/team/quit"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPartnerServiceQuitTeam))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

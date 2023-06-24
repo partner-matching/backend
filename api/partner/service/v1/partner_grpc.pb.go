@@ -26,6 +26,7 @@ const (
 	PartnerService_GetTeam_FullMethodName     = "/partner.v1.PartnerService/GetTeam"
 	PartnerService_GetTeamList_FullMethodName = "/partner.v1.PartnerService/GetTeamList"
 	PartnerService_JoinTeam_FullMethodName    = "/partner.v1.PartnerService/JoinTeam"
+	PartnerService_QuitTeam_FullMethodName    = "/partner.v1.PartnerService/QuitTeam"
 )
 
 // PartnerServiceClient is the client API for PartnerService service.
@@ -38,6 +39,7 @@ type PartnerServiceClient interface {
 	GetTeam(ctx context.Context, in *GetTeamReq, opts ...grpc.CallOption) (*GetTeamResponse, error)
 	GetTeamList(ctx context.Context, in *GetTeamListReq, opts ...grpc.CallOption) (*GetTeamListResponse, error)
 	JoinTeam(ctx context.Context, in *JoinTeamReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	QuitTeam(ctx context.Context, in *QuitTeamReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type partnerServiceClient struct {
@@ -102,6 +104,15 @@ func (c *partnerServiceClient) JoinTeam(ctx context.Context, in *JoinTeamReq, op
 	return out, nil
 }
 
+func (c *partnerServiceClient) QuitTeam(ctx context.Context, in *QuitTeamReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PartnerService_QuitTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PartnerServiceServer is the server API for PartnerService service.
 // All implementations must embed UnimplementedPartnerServiceServer
 // for forward compatibility
@@ -112,6 +123,7 @@ type PartnerServiceServer interface {
 	GetTeam(context.Context, *GetTeamReq) (*GetTeamResponse, error)
 	GetTeamList(context.Context, *GetTeamListReq) (*GetTeamListResponse, error)
 	JoinTeam(context.Context, *JoinTeamReq) (*emptypb.Empty, error)
+	QuitTeam(context.Context, *QuitTeamReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedPartnerServiceServer()
 }
 
@@ -136,6 +148,9 @@ func (UnimplementedPartnerServiceServer) GetTeamList(context.Context, *GetTeamLi
 }
 func (UnimplementedPartnerServiceServer) JoinTeam(context.Context, *JoinTeamReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinTeam not implemented")
+}
+func (UnimplementedPartnerServiceServer) QuitTeam(context.Context, *QuitTeamReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuitTeam not implemented")
 }
 func (UnimplementedPartnerServiceServer) mustEmbedUnimplementedPartnerServiceServer() {}
 
@@ -258,6 +273,24 @@ func _PartnerService_JoinTeam_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PartnerService_QuitTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuitTeamReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PartnerServiceServer).QuitTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PartnerService_QuitTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PartnerServiceServer).QuitTeam(ctx, req.(*QuitTeamReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PartnerService_ServiceDesc is the grpc.ServiceDesc for PartnerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +321,10 @@ var PartnerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "JoinTeam",
 			Handler:    _PartnerService_JoinTeam_Handler,
+		},
+		{
+			MethodName: "QuitTeam",
+			Handler:    _PartnerService_QuitTeam_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

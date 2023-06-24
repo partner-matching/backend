@@ -849,6 +849,107 @@ var _ interface {
 	ErrorName() string
 } = JoinTeamReqValidationError{}
 
+// Validate checks the field values on QuitTeamReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *QuitTeamReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QuitTeamReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in QuitTeamReqMultiError, or
+// nil if none found.
+func (m *QuitTeamReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuitTeamReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	if len(errors) > 0 {
+		return QuitTeamReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// QuitTeamReqMultiError is an error wrapping multiple validation errors
+// returned by QuitTeamReq.ValidateAll() if the designated constraints aren't met.
+type QuitTeamReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuitTeamReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuitTeamReqMultiError) AllErrors() []error { return m }
+
+// QuitTeamReqValidationError is the validation error returned by
+// QuitTeamReq.Validate if the designated constraints aren't met.
+type QuitTeamReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuitTeamReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QuitTeamReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QuitTeamReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QuitTeamReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QuitTeamReqValidationError) ErrorName() string { return "QuitTeamReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e QuitTeamReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuitTeamReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuitTeamReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuitTeamReqValidationError{}
+
 // Validate checks the field values on Team with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
