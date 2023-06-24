@@ -72,3 +72,27 @@ func IsGetTeamListFailed(err error) bool {
 func ErrorGetTeamListFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, PartnerErrorReason_GET_TEAM_LIST_FAILED.String(), fmt.Sprintf(format, args...))
 }
+
+func IsAddUserTeamFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == PartnerErrorReason_ADD_USER_TEAM_FAILED.String() && e.Code == 500
+}
+
+func ErrorAddUserTeamFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, PartnerErrorReason_ADD_USER_TEAM_FAILED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsJoinTeamFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == PartnerErrorReason_JOIN_TEAM_FAILED.String() && e.Code == 500
+}
+
+func ErrorJoinTeamFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, PartnerErrorReason_JOIN_TEAM_FAILED.String(), fmt.Sprintf(format, args...))
+}
