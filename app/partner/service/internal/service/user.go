@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *PartnerService) SearchUsers(ctx context.Context, req *v1.SearchUsersReq) (*v1.SearchUsersReply, error) {
+func (s *UserService) SearchUsers(ctx context.Context, req *v1.SearchUsersReq) (*v1.SearchUsersReply, error) {
 	usersList, err := s.uc.SearchUsers(ctx, req.UserName)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (s *PartnerService) SearchUsers(ctx context.Context, req *v1.SearchUsersReq
 }
 
 // SearchUsersByTags 根据标签搜索用户
-func (s *PartnerService) SearchUsersByTags(ctx context.Context, req *v1.SearchUsersByTagsReq) (*v1.SearchUsersReply, error) {
+func (s *UserService) SearchUsersByTags(ctx context.Context, req *v1.SearchUsersByTagsReq) (*v1.SearchUsersReply, error) {
 	usersList, err := s.uc.SearchUsersByTagsInCache(ctx, req.TagNameList)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (s *PartnerService) SearchUsersByTags(ctx context.Context, req *v1.SearchUs
 	return reply, nil
 }
 
-func (s *PartnerService) DeleteUser(ctx context.Context, req *v1.DeleteUserReq) (*emptypb.Empty, error) {
+func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserReq) (*emptypb.Empty, error) {
 	search := &biz.DeleteUser{
 		Id: req.Id,
 	}
@@ -80,7 +80,7 @@ func (s *PartnerService) DeleteUser(ctx context.Context, req *v1.DeleteUserReq) 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PartnerService) GetCurrentUser(ctx context.Context, _ *emptypb.Empty) (*v1.GetCurrentReply, error) {
+func (s *UserService) GetCurrentUser(ctx context.Context, _ *emptypb.Empty) (*v1.GetCurrentReply, error) {
 	user, empty, err := s.uc.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (s *PartnerService) GetCurrentUser(ctx context.Context, _ *emptypb.Empty) (
 	}, nil
 }
 
-func (s *PartnerService) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*emptypb.Empty, error) {
+func (s *UserService) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) (*emptypb.Empty, error) {
 	updateUser := &biz.UpdateUser{
 		Id:        req.Data.Id,
 		UserName:  req.Data.UserName,
@@ -132,7 +132,7 @@ func (s *PartnerService) UpdateUser(ctx context.Context, req *v1.UpdateUserReq) 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *PartnerService) UsersRecommend(ctx context.Context, req *v1.UsersRecommendReq) (*v1.UsersRecommendReply, error) {
+func (s *UserService) UsersRecommend(ctx context.Context, req *v1.UsersRecommendReq) (*v1.UsersRecommendReply, error) {
 	usersList, err := s.uc.UsersRecommend(ctx, req.PageNum, req.PageSize)
 	if err != nil {
 		return nil, err
