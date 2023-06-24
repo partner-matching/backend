@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "validate/validate.proto";
 import "google/protobuf/duration.proto";
+import "partner/service/v1/user.proto";
 
 option go_package = "api/partner/service/v1;v1";
 
@@ -17,21 +18,21 @@ service PartnerService {
     };
   }
 
-  rpc DeleteTeam (Team) returns (google.protobuf.Empty){
+  rpc DeleteTeam (DeleteTeamReq) returns (google.protobuf.Empty){
     option (google.api.http) = {
       post: "/api/team/delete",
       body: "*"
     };
   }
 
-  rpc UpdateTeam (Team) returns (google.protobuf.Empty){
+  rpc UpdateTeam (UpdateTeamReq) returns (google.protobuf.Empty){
     option (google.api.http) = {
       post: "/api/team/update",
       body: "*"
     };
   }
 
-  rpc GetTeam (Team) returns (GetTeamResponse){
+  rpc GetTeam (GetTeamReq) returns (GetTeamResponse){
     option (google.api.http) = {
       get: "/api/team/get",
     };
@@ -43,6 +44,13 @@ service PartnerService {
     };
   }
 
+  rpc JoinTeam (JoinTeamReq) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/api/team/join",
+      body: "*"
+    };
+  }
+
 }
 
 message GetTeamResponse{
@@ -50,13 +58,38 @@ message GetTeamResponse{
 }
 
 message GetTeamListResponse{
-  repeated Team data = 1;
+  message TeamInfo{
+    Team team = 1;
+    user.v1.User userInfo = 2;
+  }
+  repeated TeamInfo data = 1;
+}
+
+message DeleteTeamReq{
+  int32 id = 1;
+}
+
+message UpdateTeamReq{
+  string name = 1;
+  string expireTime = 2;
+  int32 status = 3;
+  string password = 4;
+  string description = 5;
+}
+
+message GetTeamReq{
+  int32 id = 1;
 }
 
 message GetTeamListReq{
   int32 page = 1;
   int32 pageSize = 2;
   Team query = 3;
+}
+
+message JoinTeamReq{
+  int32 id = 1;
+  string passWord = 2;
 }
 
 message Team{

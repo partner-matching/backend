@@ -24,14 +24,16 @@ const OperationPartnerServiceAddTeam = "/partner.v1.PartnerService/AddTeam"
 const OperationPartnerServiceDeleteTeam = "/partner.v1.PartnerService/DeleteTeam"
 const OperationPartnerServiceGetTeam = "/partner.v1.PartnerService/GetTeam"
 const OperationPartnerServiceGetTeamList = "/partner.v1.PartnerService/GetTeamList"
+const OperationPartnerServiceJoinTeam = "/partner.v1.PartnerService/JoinTeam"
 const OperationPartnerServiceUpdateTeam = "/partner.v1.PartnerService/UpdateTeam"
 
 type PartnerServiceHTTPServer interface {
 	AddTeam(context.Context, *Team) (*emptypb.Empty, error)
-	DeleteTeam(context.Context, *Team) (*emptypb.Empty, error)
-	GetTeam(context.Context, *Team) (*GetTeamResponse, error)
+	DeleteTeam(context.Context, *DeleteTeamReq) (*emptypb.Empty, error)
+	GetTeam(context.Context, *GetTeamReq) (*GetTeamResponse, error)
 	GetTeamList(context.Context, *GetTeamListReq) (*GetTeamListResponse, error)
-	UpdateTeam(context.Context, *Team) (*emptypb.Empty, error)
+	JoinTeam(context.Context, *JoinTeamReq) (*emptypb.Empty, error)
+	UpdateTeam(context.Context, *UpdateTeamReq) (*emptypb.Empty, error)
 }
 
 func RegisterPartnerServiceHTTPServer(s *http.Server, srv PartnerServiceHTTPServer) {
@@ -41,6 +43,7 @@ func RegisterPartnerServiceHTTPServer(s *http.Server, srv PartnerServiceHTTPServ
 	r.POST("/api/team/update", _PartnerService_UpdateTeam0_HTTP_Handler(srv))
 	r.GET("/api/team/get", _PartnerService_GetTeam0_HTTP_Handler(srv))
 	r.GET("/api/team/list", _PartnerService_GetTeamList0_HTTP_Handler(srv))
+	r.POST("/api/team/join", _PartnerService_JoinTeam0_HTTP_Handler(srv))
 }
 
 func _PartnerService_AddTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
@@ -64,13 +67,13 @@ func _PartnerService_AddTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ct
 
 func _PartnerService_DeleteTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in Team
+		var in DeleteTeamReq
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationPartnerServiceDeleteTeam)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteTeam(ctx, req.(*Team))
+			return srv.DeleteTeam(ctx, req.(*DeleteTeamReq))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -83,13 +86,13 @@ func _PartnerService_DeleteTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func
 
 func _PartnerService_UpdateTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in Team
+		var in UpdateTeamReq
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationPartnerServiceUpdateTeam)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateTeam(ctx, req.(*Team))
+			return srv.UpdateTeam(ctx, req.(*UpdateTeamReq))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -102,13 +105,13 @@ func _PartnerService_UpdateTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func
 
 func _PartnerService_GetTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in Team
+		var in GetTeamReq
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationPartnerServiceGetTeam)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetTeam(ctx, req.(*Team))
+			return srv.GetTeam(ctx, req.(*GetTeamReq))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -138,12 +141,32 @@ func _PartnerService_GetTeamList0_HTTP_Handler(srv PartnerServiceHTTPServer) fun
 	}
 }
 
+func _PartnerService_JoinTeam0_HTTP_Handler(srv PartnerServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in JoinTeamReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPartnerServiceJoinTeam)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.JoinTeam(ctx, req.(*JoinTeamReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PartnerServiceHTTPClient interface {
 	AddTeam(ctx context.Context, req *Team, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	DeleteTeam(ctx context.Context, req *Team, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	GetTeam(ctx context.Context, req *Team, opts ...http.CallOption) (rsp *GetTeamResponse, err error)
+	DeleteTeam(ctx context.Context, req *DeleteTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetTeam(ctx context.Context, req *GetTeamReq, opts ...http.CallOption) (rsp *GetTeamResponse, err error)
 	GetTeamList(ctx context.Context, req *GetTeamListReq, opts ...http.CallOption) (rsp *GetTeamListResponse, err error)
-	UpdateTeam(ctx context.Context, req *Team, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	JoinTeam(ctx context.Context, req *JoinTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateTeam(ctx context.Context, req *UpdateTeamReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type PartnerServiceHTTPClientImpl struct {
@@ -167,7 +190,7 @@ func (c *PartnerServiceHTTPClientImpl) AddTeam(ctx context.Context, in *Team, op
 	return &out, err
 }
 
-func (c *PartnerServiceHTTPClientImpl) DeleteTeam(ctx context.Context, in *Team, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *PartnerServiceHTTPClientImpl) DeleteTeam(ctx context.Context, in *DeleteTeamReq, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/team/delete"
 	path := binding.EncodeURL(pattern, in, false)
@@ -180,7 +203,7 @@ func (c *PartnerServiceHTTPClientImpl) DeleteTeam(ctx context.Context, in *Team,
 	return &out, err
 }
 
-func (c *PartnerServiceHTTPClientImpl) GetTeam(ctx context.Context, in *Team, opts ...http.CallOption) (*GetTeamResponse, error) {
+func (c *PartnerServiceHTTPClientImpl) GetTeam(ctx context.Context, in *GetTeamReq, opts ...http.CallOption) (*GetTeamResponse, error) {
 	var out GetTeamResponse
 	pattern := "/api/team/get"
 	path := binding.EncodeURL(pattern, in, true)
@@ -206,7 +229,20 @@ func (c *PartnerServiceHTTPClientImpl) GetTeamList(ctx context.Context, in *GetT
 	return &out, err
 }
 
-func (c *PartnerServiceHTTPClientImpl) UpdateTeam(ctx context.Context, in *Team, opts ...http.CallOption) (*emptypb.Empty, error) {
+func (c *PartnerServiceHTTPClientImpl) JoinTeam(ctx context.Context, in *JoinTeamReq, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/team/join"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPartnerServiceJoinTeam))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *PartnerServiceHTTPClientImpl) UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/team/update"
 	path := binding.EncodeURL(pattern, in, false)
