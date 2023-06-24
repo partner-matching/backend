@@ -37,9 +37,10 @@ func wireApp(confServer *conf.Server, confData *conf.Data, userConstant *conf.Us
 	partnerRepo := data.NewPartnerRepo(dataData, logger)
 	partnerRepoUseCase := biz.NewPartnerRepoUseCase(partnerRepo, recovery, transaction, logger)
 	validateUseCase := biz.NewValidateUseCase()
-	partnerService := service.NewUserService(userUseCase, authRepoUseCase, partnerRepoUseCase, validateUseCase, logger)
-	grpcServer := server.NewGRPCServer(confServer, partnerService, logger)
-	httpServer := server.NewHTTPServer(confServer, partnerService, logger)
+	userService := service.NewUserService(userUseCase, authRepoUseCase, partnerRepoUseCase, validateUseCase, logger)
+	partnerService := service.NewPartnerService(userUseCase, authRepoUseCase, partnerRepoUseCase, validateUseCase, logger)
+	grpcServer := server.NewGRPCServer(confServer, userService, partnerService, logger)
+	httpServer := server.NewHTTPServer(confServer, userService, partnerService, logger)
 	cronJob := server.NewCronJob(mutex, userUseCase)
 	app := newApp(logger, grpcServer, httpServer, cronJob)
 	return app, func() {
