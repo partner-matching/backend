@@ -13,11 +13,14 @@ type PartnerRepo interface {
 	AddTeam(ctx context.Context, team *CreateTeam) (int32, error)
 	AddUserTeam(ctx context.Context, userTeam *UserTeam) (int32, error)
 	DeleteTeam(ctx context.Context, teamId int32) error
-	UpdateTeam(ctx context.Context, team *UpdateTeam, userId int32, bool2 bool) error
+	DeleteUserTeam(ctx context.Context, teamId, userId int32) error
+	UpdateTeam(ctx context.Context, team *UpdateTeam) error
 	GetTeam(ctx context.Context, teamId int32) (*Team, error)
 	GetTeamCountByUserId(ctx context.Context, userId int32) (int64, error)
 	GetTeamList(ctx context.Context, query *TeamQuery, page, pageSizer int32) ([]*TeamList, error)
 	GetUserTeamListByUserId(ctx context.Context, userId int32) ([]*UserTeam, error)
+	GetUserTeamCountByTeamId(ctx context.Context, teamId int32) (int64, error)
+	GetTeamNextManager(ctx context.Context, teamId, userId int32) (int32, error)
 }
 
 type PartnerRepoUseCase struct {
@@ -145,11 +148,23 @@ type UpdateTeam struct {
 }
 
 func (r *PartnerRepoUseCase) UpdateTeam(ctx context.Context, team *UpdateTeam, userId int32, isAdmin bool) error {
+	teamInfo, err := r.repo.GetTeam(ctx, team.Id)
+	if kerrors.IsNotFound(err) {
+		return v1.ErrorUpdateTeamFailed("该队伍不存在")
+	}
+	if err != nil {
+		return v1.ErrorUpdateTeamFailed("未知错误: %s", err.Error())
+	}
+
+	// 只有管理员或者队伍的创建者可以修改
+	if !isAdmin && teamInfo.UserId != userId {
+		return v1.ErrorPermissionDeny("只有管理员或者队伍的创建者可以修改")
+	}
 	//如果队伍状态改为加密，必须要有密码
 	if team.Status == 2 && team.Password == "" {
 		return v1.ErrorUpdateTeamFailed("密码不能为空")
 	}
-	err := r.repo.UpdateTeam(ctx, team, userId, isAdmin)
+	err = r.repo.UpdateTeam(ctx, team)
 	if err != nil {
 		return v1.ErrorUpdateTeamFailed("队伍更新错误: %s", err.Error())
 	}
@@ -215,9 +230,19 @@ func (r *PartnerRepoUseCase) JoinTeam(ctx context.Context, team *JoinTeam, user 
 		return v1.ErrorJoinTeamFailed("该队伍不存在")
 	}
 	if err != nil {
-		return v1.ErrorJoinTeamFailed(fmt.Sprintf("加入队伍出错: %s", err.Error()))
+		return v1.ErrorJoinTeamFailed("加入队伍出错: %s", err.Error())
 	}
 
+	// 只能加入未满的队伍
+	userCount, err := r.repo.GetUserTeamCountByTeamId(ctx, team.Id)
+	if err != nil {
+		return v1.ErrorJoinTeamFailed("加入队伍出错: %s", err.Error())
+	}
+	if userCount > int64(teamInfo.MaxNum) {
+		return v1.ErrorJoinTeamFailed("队伍已满")
+	}
+
+	// 只能加入未过期的队伍
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", teamInfo.ExpireTime)
 	if err != nil {
 		return v1.ErrorUnknownError(fmt.Sprintf("未知错误: %s", err.Error()))
@@ -250,8 +275,99 @@ func (r *PartnerRepoUseCase) JoinTeam(ctx context.Context, team *JoinTeam, user 
 		UserId: user.Id,
 	})
 	if teamInfo.Status == 2 && team.Password != teamInfo.Password {
-		return v1.ErrorJoinTeamFailed(fmt.Sprintf("加入队伍出错: %s", err.Error()))
+		return v1.ErrorJoinTeamFailed("加入队伍出错: %s", err.Error())
 	}
 
+	return nil
+}
+
+type QuitTeam struct {
+	Team
+	Id int32 `validate:"required,gte=0" comment:"id"`
+}
+
+// QuitTeam
+//1. 只剩一人，队伍解散
+//
+//2. 还有其他人
+//
+//1. 如果是队长退出队伍，权限转移给第二早加入的用户 —— 先来后到
+//
+//> 只用取 id 最小的 2 条数据
+//
+//2. 非队长，自己退出队伍
+
+func (r *PartnerRepoUseCase) QuitTeam(ctx context.Context, team *QuitTeam, user *User) error {
+	teamInfo, err := r.repo.GetTeam(ctx, team.Id)
+	if kerrors.IsNotFound(err) {
+		return v1.ErrorQuitTeamFailed("该队伍不存在")
+	}
+	if err != nil {
+		return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+	}
+
+	userCount, err := r.repo.GetUserTeamCountByTeamId(ctx, team.Id)
+	if err != nil {
+		return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+	}
+
+	if userCount == 1 {
+		//1. 只剩一人，队伍解散
+		err = r.tm.ExecTx(ctx, func(ctx context.Context) error {
+			err = r.repo.DeleteTeam(ctx, team.Id)
+			if kerrors.IsNotFound(err) {
+				return v1.ErrorQuitTeamFailed("该队伍不存在")
+			}
+			if err != nil {
+				return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+			}
+
+			err = r.repo.DeleteUserTeam(ctx, team.Id, user.Id)
+			if kerrors.IsNotFound(err) {
+				return v1.ErrorQuitTeamFailed("未曾加入过该队伍")
+			}
+			if err != nil {
+				return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	//2. 还有其他人
+	err = r.tm.ExecTx(ctx, func(ctx context.Context) error {
+		//如果是队长退出队伍，权限转移给第二早加入的用户 —— 先来后到
+		//只用取 id 最小的 2 条数据
+		if teamInfo.UserId == user.Id {
+			nextUser, err := r.repo.GetTeamNextManager(ctx, team.Id, user.Id)
+			if err != nil {
+				return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+			}
+
+			updateTeam := &UpdateTeam{}
+			updateTeam.Id = team.Id
+			updateTeam.UserId = nextUser
+			err = r.repo.UpdateTeam(ctx, updateTeam)
+			if err != nil {
+				return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+			}
+		}
+
+		//非队长，自己退出队伍
+		err = r.repo.DeleteUserTeam(ctx, team.Id, user.Id)
+		if kerrors.IsNotFound(err) {
+			return v1.ErrorQuitTeamFailed("未曾加入过该队伍")
+		}
+		if err != nil {
+			return v1.ErrorQuitTeamFailed("退出队伍出错: %s", err.Error())
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

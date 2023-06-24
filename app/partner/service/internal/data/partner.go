@@ -59,22 +59,31 @@ func (r *partnerRepo) DeleteTeam(ctx context.Context, teamId int32) error {
 		IsDelete: 1,
 	}
 	err := r.data.db.WithContext(ctx).Where("id = ? and isDelete = 0", teamId).Delete(team).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return kerrors.NotFound("team is not found from db", fmt.Sprintln(teamId))
+	}
 	if err != nil {
 		return errors.Wrapf(err, fmt.Sprintf("fail to delete team: teamId(%v)", teamId))
 	}
 	return nil
 }
 
-func (r *partnerRepo) UpdateTeam(ctx context.Context, team *biz.UpdateTeam, userId int32, isAdmin bool) error {
+func (r *partnerRepo) DeleteUserTeam(ctx context.Context, teamId, userId int32) error {
+	userTeam := &UserTeam{}
+	err := r.data.db.WithContext(ctx).Where("teamId = ? and userId = ? and isDelete = 0", teamId, userId).Delete(userTeam).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return kerrors.NotFound("user team is not found from db", fmt.Sprintf("teamId: %v, userId: %v", teamId, userId))
+	}
+	if err != nil {
+		return errors.Wrapf(err, fmt.Sprintf("fail to delete user team: teamId(%v), userId(%v)", teamId, userId))
+	}
+	return nil
+}
+
+func (r *partnerRepo) UpdateTeam(ctx context.Context, team *biz.UpdateTeam) error {
 	t := &Team{}
 	util.StructAssign(t, team)
-	queryDB := r.data.db.WithContext(ctx).Where("isDelete = 0")
-	//只有管理员或者队伍的创建者可以修改
-	switch isAdmin {
-	case false:
-		queryDB.Where("userId = ?", userId)
-	}
-	err := r.data.db.WithContext(ctx).Where("id = ?", t.Id).Updates(t).Error
+	err := r.data.db.WithContext(ctx).Where("id = ? and isDelete = 0", t.Id).Updates(t).Error
 	if err != nil {
 		return errors.Wrapf(err, fmt.Sprintf("fail to update team: team(%v)", team))
 	}
@@ -182,4 +191,28 @@ func (r *partnerRepo) GetUserTeamListByUserId(ctx context.Context, userId int32)
 		result = append(result, userTeam)
 	}
 	return result, nil
+}
+
+func (r *partnerRepo) GetUserTeamCountByTeamId(ctx context.Context, teamId int32) (int64, error) {
+	var count int64
+	userTeam := &UserTeam{}
+	err := r.data.db.WithContext(ctx).Model(userTeam).Where("teamId = ? and isDelete = 0", teamId).Count(&count).Error
+	if err != nil {
+		return 0, errors.Wrapf(err, fmt.Sprintf("get user team count by team id failed: teamId(%v)", teamId))
+	}
+	return count, nil
+}
+
+func (r *partnerRepo) GetTeamNextManager(ctx context.Context, teamId, userId int32) (int32, error) {
+	userTeam := &UserTeam{}
+	err := r.data.db.WithContext(ctx).Where("teamId = ? and userId = ? and isDelete = 0", teamId, userId).First(userTeam).Error
+	if err != nil {
+		return 0, errors.Wrapf(err, fmt.Sprintf("get user team failed: teamId(%v), userId(%v)", teamId, userId))
+	}
+
+	err = r.data.db.WithContext(ctx).Where("id > ? and isDelete = 0", userTeam.Id).First(userTeam).Error
+	if err != nil {
+		return 0, errors.Wrapf(err, fmt.Sprintf("get team next manager failed: userId(%v)", userTeam.Id))
+	}
+	return userTeam.Id, nil
 }

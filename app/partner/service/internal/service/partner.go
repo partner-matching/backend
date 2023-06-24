@@ -157,20 +157,42 @@ func (s *PartnerService) GetTeamList(ctx context.Context, req *v1.GetTeamListReq
 }
 
 func (s *PartnerService) JoinTeam(ctx context.Context, req *v1.JoinTeamReq) (*emptypb.Empty, error) {
-	//是否登录，未登录不允许修改
-	//user, err := s.uc.IsUserLogin(ctx)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	joinTeam := &biz.JoinTeam{}
-	util.StructAssign(joinTeam, req)
-	err := s.vc.ParamsValidate(joinTeam)
+	//是否登录，未登录不允许加入队伍
+	user, err := s.uc.IsUserLogin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.pc.JoinTeam(ctx, joinTeam, nil)
+	joinTeam := &biz.JoinTeam{}
+	util.StructAssign(joinTeam, req)
+	err = s.vc.ParamsValidate(joinTeam)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.pc.JoinTeam(ctx, joinTeam, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *PartnerService) QuitTeam(ctx context.Context, req *v1.QuitTeamReq) (*emptypb.Empty, error) {
+	//是否登录，未登录不允许修改
+	user, err := s.uc.IsUserLogin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	quitTeam := &biz.QuitTeam{}
+	util.StructAssign(quitTeam, req)
+	err = s.vc.ParamsValidate(quitTeam)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.pc.QuitTeam(ctx, quitTeam, user)
 	if err != nil {
 		return nil, err
 	}
