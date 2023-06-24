@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package global_error.v1;
+import "errors/errors.proto";
+
+option go_package = "api/partner/service/v1/pb;v1";
+
+enum GlobalErrorReason {
+  option (errors.default_code) = 500;
+  PERMISSION_DENY = 0;
+
+}
