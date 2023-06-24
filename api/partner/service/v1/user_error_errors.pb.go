@@ -109,18 +109,6 @@ func ErrorUserDeleteFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, UserErrorReason_USER_DELETE_FAILED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsPermissionDeny(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == UserErrorReason_PERMISSION_DENY.String() && e.Code == 500
-}
-
-func ErrorPermissionDeny(format string, args ...interface{}) *errors.Error {
-	return errors.New(500, UserErrorReason_PERMISSION_DENY.String(), fmt.Sprintf(format, args...))
-}
-
 func IsLoginStateTimeout(err error) bool {
 	if err == nil {
 		return false
