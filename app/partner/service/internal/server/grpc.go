@@ -14,7 +14,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC user.
-func NewGRPCServer(c *conf.Server, userService *service.PartnerService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, userService *service.UserService, partnerService *service.PartnerService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(recovery.WithHandler(func(ctx context.Context, req, err interface{}) error {
@@ -24,7 +24,7 @@ func NewGRPCServer(c *conf.Server, userService *service.PartnerService, logger l
 			})),
 			ratelimit.Server(),
 			responseServer(),
-			logging.Server(log.NewFilter(logger, log.FilterLevel(log.LevelError))),
+			logging.Server(log.NewFilter(logger, log.FilterLevel(log.LevelInfo))),
 			validate.Validator(),
 		),
 	}
@@ -39,5 +39,6 @@ func NewGRPCServer(c *conf.Server, userService *service.PartnerService, logger l
 	}
 	srv := grpc.NewServer(opts...)
 	v1.RegisterUserServiceServer(srv, userService)
+	v1.RegisterPartnerServiceServer(srv, partnerService)
 	return srv
 }
