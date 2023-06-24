@@ -17,7 +17,7 @@ import (
 )
 
 // NewHTTPServer new a HTTP user.
-func NewHTTPServer(c *conf.Server, userService *service.PartnerService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, userService *service.UserService, partnerService *service.PartnerService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(recovery.WithHandler(func(ctx context.Context, req, err interface{}) error {
@@ -27,7 +27,7 @@ func NewHTTPServer(c *conf.Server, userService *service.PartnerService, logger l
 			})),
 			ratelimit.Server(),
 			responseServer(),
-			logging.Server(log.NewFilter(logger, log.FilterLevel(log.LevelError))),
+			logging.Server(log.NewFilter(logger, log.FilterLevel(log.LevelInfo))),
 			validate.Validator(),
 		),
 		// 允许跨域
@@ -49,6 +49,7 @@ func NewHTTPServer(c *conf.Server, userService *service.PartnerService, logger l
 	}
 	srv := http.NewServer(opts...)
 	v1.RegisterUserServiceHTTPServer(srv, userService)
+	v1.RegisterPartnerServiceHTTPServer(srv, partnerService)
 
 	// swagger 调试开启
 	openAPIHandler := openapiv2.NewHandler()
